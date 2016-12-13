@@ -1,16 +1,18 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r, ECHO=TRUE}
+
+```r
 library(ggplot2)
 library(chron)
+```
 
+```
+## Warning: package 'chron' was built under R version 3.2.5
+```
+
+```r
 unzip("activity.zip", "activity.csv")
 activity_data <- read.csv("activity.csv", sep=",", header=T)
 unlink("activity.csv")
@@ -18,51 +20,63 @@ unlink("activity.csv")
 
 
 
-The data are loaded into the variable **activity_data** which consists of 3 columns **(`r names(activity_data)`)** and **`r dim(activity_data)[1]`** rows (observations)
+The data are loaded into the variable **activity_data** which consists of 3 columns **(steps, date, interval)** and **17568** rows (observations)
 
-```{r, ECHO=TRUE}
+
+```r
 daily_steps <-aggregate(steps ~ date, data=activity_data,  sum, na.rm=TRUE)
 h <- hist(daily_steps$steps, xlab="Total Daily Steps", main="Histogram of Number of Daily Steps\n(ignores missing data)", breaks=10)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
 
 
 ## What is mean total number of steps taken per day?
 
-```{r, ECHO=TRUE}
+
+```r
 options(scipen = 1, digits = 0)
 info <- summary(daily_steps$steps, digits=10)
 ```
 
-The mean of the total steps each day is **`r info["Mean"]`**
+The mean of the total steps each day is **10766**
 
-The median of the total steps each day is **`r info["Median"]`**
+The median of the total steps each day is **10765**
 
 
 ## What is the average daily activity pattern?
-```{r, ECHO=TRUE}
+
+```r
 time_steps <-aggregate(steps ~ interval, data=activity_data,  mean, na.rm=TRUE)
 plot(time_steps$steps,  type="l", xlab="Interval", ylab="Average Number of Steps",
      main="Steps Averaged in the Same 5 Minute Interval\n over all days", col="blue")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
 interval_row_with_max_steps <- which.max(time_steps$steps)
 interval_label_with_max_steps <-time_steps[which.max(time_steps$steps),1]
 max_steps <- time_steps[which.max(time_steps$steps),2]
 ```
 
-The time interval with the maximum number of steps is in row **`r interval_row_with_max_steps`**
+The time interval with the maximum number of steps is in row **104**
 
-This corresponds to the interval numbered **`r interval_label_with_max_steps`** with **`r max_steps`** steps
+This corresponds to the interval numbered **835** with **206** steps
 
 ## Imputing missing values
-```{r, ECHO=TRUE}
+
+```r
  number_missing_rows <- sum(is.na(activity_data$steps))
 ```
 
-There are **`r number_missing_rows`** missing values in the dataset.
+There are **2304** missing values in the dataset.
 
 We will replace the missing data with the average data from the corresponding time periods for days that are not missing that data.
 
-```{r, ECHO=TRUE}
+
+```r
 # Repeat the interval averages 61 times, corresponding to 31 days in OCT + 30 days in NOV
 mean_time_steps<- do.call("rbind", replicate(61, time_steps, simplify = FALSE))
 mean_time_steps$interval <- NULL  # drop the interval column for this table
@@ -74,20 +88,24 @@ activity_data$steps <-
 ```
 
 
-```{r, ECHO=TRUE}
+
+```r
 daily_steps <-aggregate(steps ~ date, data=activity_data,  sum, na.rm=TRUE)
 h <- hist(daily_steps$steps, xlab="Total Daily Steps", main="Histogram of Number of Daily Steps\n(ignores missing data)", breaks=10)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-```{r, ECHO=TRUE}
+
+
+```r
 options(scipen = 1, digits = 0)
 info <- summary(daily_steps$steps, digits=10)
 ```
 
-The new mean of the total steps each day is **`r info["Mean"]`**
+The new mean of the total steps each day is **10766**
 
-The new median of the total steps each day is **`r info["Median"]`**
+The new median of the total steps each day is **10766**
 
 Therefore, the particular way that I used to replace the missing values changed the median by 1, but did not change the mean. Using another method, however, might have produced different results.
 
@@ -95,7 +113,8 @@ Therefore, the particular way that I used to replace the missing values changed 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 
-```{r, ECHO=TRUE}
+
+```r
 # create a new, boolean column
 activity_data$weekend <- chron::is.weekend(activity_data$date)
 #change it to a factor
@@ -110,5 +129,6 @@ ggplot(data = step_data,
       facet_grid(facets = weekend ~ .) +
       xlab("Time Interval") +
       ylab("Number of Steps")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->

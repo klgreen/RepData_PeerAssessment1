@@ -1,0 +1,28 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
+
+
+## Loading and preprocessing the data
+```{r, ECHO=TRUE}
+unzip("activity.zip", "activity.csv")
+ad <- read.csv("activity.csv", sep=",", header=T)
+unlink("activity.csv")
+```
+
+## What is mean total number of steps taken per day?
+
+
+
+## What is the average daily activity pattern?
+
+
+
+## Imputing missing values
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
